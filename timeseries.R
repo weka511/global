@@ -20,8 +20,7 @@ if (!require(NISTunits)) {
   library(NISTunits)
 }
 
-
-setwd('D:\\root\\sandbox\\coursera\\global-warming-model\\')
+setwd("~/../global")
 
 rm(list=ls())
 
@@ -39,15 +38,7 @@ direct.surface <- function(d=3){
 }
 
 
-x.coordinate <- function(latitude,longitude,R = 1) {
-  return (cos(NISTdegTOradian(latitude)) * cos(NISTdegTOradian(longitude)))
-}
-y.coordinate <- function(latitude,longitude,R = 1) {
-  return (cos(NISTdegTOradian(latitude)) * sin(NISTdegTOradian(longitude)))
-}
-z.coordinate <- function(latitude,longitude,R = 1) {
-  return (sin(NISTdegTOradian(latitude)))
-}
+
 
 # ID                 1-11        Integer
 # LATITUDE          13-20        Real
@@ -109,6 +100,15 @@ read.index <-
   }
 
 add.cartesian.coordinates<-function(my.table) {
+  x.coordinate <- function(latitude,longitude,R = 1) {
+    return (cos(NISTdegTOradian(latitude)) * cos(NISTdegTOradian(longitude)))
+  }
+  y.coordinate <- function(latitude,longitude,R = 1) {
+    return (cos(NISTdegTOradian(latitude)) * sin(NISTdegTOradian(longitude)))
+  }
+  z.coordinate <- function(latitude,longitude,R = 1) {
+    return (sin(NISTdegTOradian(latitude)))
+  }
   xs<-as.data.frame(mapply(x.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
   ys<-as.data.frame(mapply(y.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
   zs<-as.data.frame(mapply(z.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
@@ -141,4 +141,50 @@ random.station<-function(dummy,station.data){
 
 random.station.ids<-function(n,station.data) {
   return(unlist(lapply(rep(0,n),random.station,station.data)))
+}
+
+read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120){
+  return (read.fwf(name,
+                   c(11,4,4,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1,
+                     5,1,1,1),
+                   col.names=c('ID','YEAR','ELEMENT',
+                              'VALUE1', 'DMFLAG1', 'QCFLAG1', 'DSFLAG1',
+                              'VALUE2', 'DMFLAG2', 'QCFLAG2', 'DSFLAG2',
+                              'VALUE3', 'DMFLAG3', 'QCFLAG3', 'DSFLAG3',
+                              'VALUE4', 'DMFLAG4', 'QCFLAG4', 'DSFLAG4',
+                              'VALUE5', 'DMFLAG5', 'QCFLAG5', 'DSFLAG5',
+                              'VALUE6', 'DMFLAG6', 'QCFLAG6', 'DSFLAG6',
+                              'VALUE7', 'DMFLAG7', 'QCFLAG7', 'DSFLAG7',
+                              'VALUE8', 'DMFLAG8', 'QCFLAG8', 'DSFLAG8',
+                              'VALUE9', 'DMFLAG9', 'QCFLAG9', 'DSFLAG9',
+                              'VALUE10','DMFLAG10','QCFLAG10','DSFLAG10',
+                              'VALUE11','DMFLAG11','QCFLAG11','DSFLAG11',
+                              'VALUE12','DMFLAG12','QCFLAG12','DSFLAG12'
+                              ),
+                   colClasses=c('character','integer','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character',
+                                'integer','character','character','character'  ),
+                   n = n,
+                   fill=TRUE))
 }
