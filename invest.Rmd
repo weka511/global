@@ -1,0 +1,16 @@
+---
+title: "Going Long on Temperature"
+author: "Simon Crase"
+date: "27 October 2016"
+output: word_document
+---
+
+# Idea
+
+Many people do not accept that global are rising. While some of them are naïve, others are shrewd investors. I wondered what would happen if these folk tought about the temperature the way they think of investments.
+
+The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
+
+# Methodology
+
+* Select stations at random
