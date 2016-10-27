@@ -2,8 +2,11 @@
 title: "Going Long on Temperature"
 author: "Simon Crase"
 date: "27 October 2016"
-output: word_document
+output: html_document
 ---
+```{r}
+source('timeseries.R')
+```
 
 # Idea
 
