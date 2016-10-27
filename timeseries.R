@@ -140,5 +140,5 @@ random.station<-function(dummy,station.data){
 }
 
 random.station.ids<-function(n,station.data) {
-  return(lapply(rep(0,n),random.station,station.data))
+  return(unlist(lapply(rep(0,n),random.station,station.data)))
 }
