@@ -112,9 +112,33 @@ add.cartesian.coordinates<-function(my.table) {
   xs<-as.data.frame(mapply(x.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
   ys<-as.data.frame(mapply(y.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
   zs<-as.data.frame(mapply(z.coordinate,my.table$LATITUDE,my.table$LONGITUDE))
-  result<-cbind(ii,xs,ys,zs)
+  result<-cbind(my.table,xs,ys,zs)
   colnames(result)[length(result)-2]<-'X'
   colnames(result)[length(result)-1]<-'Y'
   colnames(result)[length(result)]<-'Z'
+  rownames(result)<-result$ID
   return (result)
+}
+
+get.distance.squared <- function(id,point,station.data) {
+  station <- station.data[id,]
+  return (
+    (point[1] - station$X) * (point[1] - station$X) +
+      (point[2] - station$Y) * (point[2] - station$Y) +
+      (point[3] - station$Z) * (point[3] - station$Z)
+  )
+}
+
+find.closest.station<-function(point,station.data) {
+  distances<-lapply(rownames(station.data),get.distance.squared,point,station.data)
+  index<-which.min(distances)
+  return (rownames(station.data)[index])
+}
+
+random.station<-function(dummy,station.data){
+  find.closest.station(direct.surface(),station.data)
+}
+
+random.station.ids<-function(n,station.data) {
+  return(lapply(rep(0,n),random.station,station.data))
 }
