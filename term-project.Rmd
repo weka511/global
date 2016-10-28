@@ -1,14 +1,14 @@
 ---
-title: "Going Long on Temperature"
+title: "Temperature Trends"
 author: "Simon Crase"
-date: "27 October 2016"
+date: "29 October 2016"
 output: pdf_document
 ---
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(knitr)
 source('timeseries.R')
 # Set n.records to -1 to process the entire dataset, 0r 10000 for testing
-n.records <- -1
+n.records <- 1000
 # Number of stations
 n.stations <- 25
 ```
@@ -74,11 +74,21 @@ for (id in ids){
   y<-dd$MEAN
   model<-lm(y~x)
   slope<-coef(model)[[2]]
-  if (slope>0) n.increase <- n.increase +1
-  if (slope<0) n.decrease <- n.decrease +1
-  sub<-sprintf("Slope: %.2f degrees per century", 100*slope)
-  plot(x=x,y=y,main=paste(id,name,sep=': '),sub=sub,xlab = "Year", ylab="Average T")
-  abline(model, col="red")
+  result = tryCatch({
+    if (slope>0) n.increase <- n.increase +1
+    if (slope<0) n.decrease <- n.decrease +1
+    sub<-sprintf("Slope: %.2f degrees per century", 100*slope)
+    plot(x=x,y=y,main=paste(id,name,sep=': '),sub=sub,xlab = "Year", ylab="Average T")
+    abline(model, col="red")
+  }, warning = function(w) {
+    print(slope)
+  }, error = function(e) {
+    plot(x=x,y=y,main=paste(id,name,sep=': '),sub="Error",xlab = "Year", ylab="Average T")
+  }, finally = {
+    
+  })
+
+
 }
 
 ```
