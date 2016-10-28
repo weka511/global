@@ -2,15 +2,15 @@
 title: "Going Long on Temperature"
 author: "Simon Crase"
 date: "27 October 2016"
-output: html_document
+output: pdf_document
 ---
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(knitr)
 source('timeseries.R')
 # Set n.records to -1 to process the entire dataset, 0r 10000 for testing
-n.records=1000
+n.records <- -1
 # Number of stations
-n.stations=25
+n.stations <- 25
 ```
 
 # Introduction
@@ -24,20 +24,20 @@ img <- readPNG("TimeSeriesBrowser.png")
  grid.raster(img)
 ```
 
-I therefore decided to sample uniformly across the globe: select positions at random, and take the readings from the nearest stations with adequate data. See Methodology Secyion below.
+I therefore decided to sample uniformly across the globe: select positions at random, and take the readings from the nearest stations with adequate data. See Methodology Section below.
 
 
 ##References
 
 * Code is stored in [my Github repository - user name 'weka11'](https://github.com/weka511/global)
-* The alogorithm for uniformly sampling points on the surface of a globe is doumented in [Statistical Mechanics: Algorithms and Computations, Werner Krauth](https://www.amazon.com/Statistical-Mechanics-Algorithms-Computations-Physics/dp/0198515367), PDF
- [here](http://blancopeck.net/Statistics.pdf)
+* The algorithm for uniformly sampling points on the surface of a globe is documented in [Statistical Mechanics: Algorithms and Computations, Werner Krauth](https://www.amazon.com/Statistical-Mechanics-Algorithms-Computations-Physics/dp/0198515367), PDF
+ [here](http://blancopeck.net/Statistics.pdf) - _algorithm 1-22, direct-surface._
 * [Time Series Browser](http://climatemodels.uchicago.edu/timeseries/)
 * [NOAA National Climatic Data Center](ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/)
 
 # Methodology
 
-I decided against using the Time Series Browser, as it was designed for accessing data by station name, not latitude and longitude. I could have written a script to generate random locations, and then screen scrape the data, but past experince with other websites has taught me that this is fraught with difficulty (typically this requires the exploitation of undocumented features in the website:_here be Dragons!_). I diecded to use the data behind the Time Series Browser instead.
+I decided against using the Time Series Browser, as it was designed for accessing data by station name, not latitude and longitude. I could have written a script to generate random locations, and then screen scrape the data, but past experince with other websites has taught me that this is fraught with difficulty (typically this requires the exploitation of undocumented features in the website: _here be Dragons!_). I decided to use the _data behind the Time Series Browser_ instead. The analyses are perfomed in [R](https://www.r-project.org/), and this document has been generarated by [R Markdown](http://rmarkdown.rstudio.com/) - see References above. **NB: as the R code uses a random number generator, the results of each run will be different.**
 
 * Download stations and monthly average temperature readings from [NOAA National Climatic Data Center](ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/)
 * Randomly sample 
@@ -49,6 +49,8 @@ I decided against using the Time Series Browser, as it was designed for accessin
 
 # Results
 
+## Stations and their locations
+
 ```{r,echo=FALSE}
 n.increase<-0
 n.decrease<-0
@@ -58,6 +60,12 @@ ids<-get.random.stations.with.data(n.stations,station.index,temperature.readings
 rownames(station.index)<-station.index$ID
 ss<-subset(station.index[ids,],TRUE,c('ID','NAME','LATITUDE','LONGITUDE'))
 kable(ss,row.names=FALSE)
+```
+
+## Details from each Station
+
+
+```{r,echo=FALSE}
 for (id in ids){
   dd<-get.data.for.station(id,temperature.readings)
   dd<-attach.average.temperature(dd)
@@ -75,10 +83,17 @@ for (id in ids){
 
 ```
 
-## Summary
+## Conclusion
 
 The temperature increased at 
 `r n.increase`
  stations and decreased at 
 `r n.decrease`
-.
+ stations. This is in line with the results I have seen each time I have generated this report for a new random selection: there are far more stations with increases than decreases.
+ 
+# Future work
+
+* Allow user to specify number of results needed since 1950 (currently script just requires some results).
+* Allow user sp specify a threshold for increases, so we would only consider temperature to increasing if the slopw exceeded some value - say 0.5 degrees per century.
+* Include a summary plot for all stations.
+* Allow program to download latest data from NOAA, insetad of using canned data.
