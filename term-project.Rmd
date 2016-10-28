@@ -2,7 +2,7 @@
 title: "Going Long on Temperature"
 author: "Simon Crase"
 date: "27 October 2016"
-output: pdf_document
+output: html_document
 ---
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(knitr)
@@ -17,24 +17,41 @@ n.stations=25
 
 ##Idea
 
-My project started with the idea of presenting temperatues from randomly selected station. I downloaded the list of station names from the [Time Series Browser](http://climatemodels.uchicago.edu/timeseries/), and wrote a short Python script to select station names at random. I then manually selected stations, see link [here](http://climatemodels.uchicago.edu/timeseries/#DpPwBjiUcCsBdlJzLhDaoQtEqDsJqMgRz).
+My project started with the idea of showing trends in temperatures from randomly selected stations. I downloaded the list of station names from the [Time Series Browser](http://climatemodels.uchicago.edu/timeseries/), and wrote a short Python script to select station names at random. I then manually selected stations, see link [here](http://climatemodels.uchicago.edu/timeseries/#DpPwBjiUcCsBdlJzLhDaoQtEqDsJqMgRz). However, there is a problem as the figure makes clear: _stations are not distributed uniformly, so the selection will also be skewed._
 ```{r fig.width=5, fig.height=5,echo=FALSE,fig.align='left'}
 library(grid)
 img <- readPNG("TimeSeriesBrowser.png")
  grid.raster(img)
 ```
 
+I therefore decided to sample uniformly across the globe: select positions at random, and take the readings from the nearest stations with adequate data. See Methodology Secyion below.
+
 
 ##References
-Code is stored in [my Github repository - user name 'weka11'](https://github.com/weka511/global)
+
+* Code is stored in [my Github repository - user name 'weka11'](https://github.com/weka511/global)
+* The alogorithm for uniformly sampling points on the surface of a globe is doumented in [Statistical Mechanics: Algorithms and Computations, Werner Krauth](https://www.amazon.com/Statistical-Mechanics-Algorithms-Computations-Physics/dp/0198515367), PDF
+ [here](http://blancopeck.net/Statistics.pdf)
+* [Time Series Browser](http://climatemodels.uchicago.edu/timeseries/)
+* [NOAA National Climatic Data Center](ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/)
 
 # Methodology
 
-* Select stations at random
+I decided against using the Time Series Browser, as it was designed for accessing data by station name, not latitude and longitude. I could have written a script to generate random locations, and then screen scrape the data, but past experince with other websites has taught me that this is fraught with difficulty (typically this requires the exploitation of undocumented features in the website:_here be Dragons!_). I diecded to use the data behind the Time Series Browser instead.
+
+* Download stations and monthly average temperature readings from [NOAA National Climatic Data Center](ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/)
+* Randomly sample 
+`r n.stations`
+ locations, uniformly distributed distributed on the surface of the Globe, using the algorithm from Werner Karuth's book, above.
+* Filter the list of stations so they are restricted to those with readings in the time interval of interest (currently 1950 to the present)
+* For each of the `r n.stations` locations, find the nearest station.
+* Tabulate the stations, and plot the time annual average temperatures, along with a regression line
 
 # Results
 
 ```{r,echo=FALSE}
+n.increase<-0
+n.decrease<-0
 station.index<-read.index()
 temperature.readings<-read.temperatures(n=n.records)
 ids<-get.random.stations.with.data(n.stations,station.index,temperature.readings)
@@ -47,7 +64,21 @@ for (id in ids){
   name<-station.index[station.index$ID==id,5]
   x<-dd$YEAR
   y<-dd$MEAN
-  plot(x=x,y=y,main=paste(id,name,sep=': '),xlab = "Year", ylab="Average T")
-  abline(lm(y~x), col="red")
+  model<-lm(y~x)
+  slope<-coef(model)[[2]]
+  if (slope>0) n.increase <- n.increase +1
+  if (slope<0) n.decrease <- n.decrease +1
+  sub<-sprintf("Slope: %.2f degrees per century", 100*slope)
+  plot(x=x,y=y,main=paste(id,name,sep=': '),sub=sub,xlab = "Year", ylab="Average T")
+  abline(model, col="red")
 }
+
 ```
+
+## Summary
+
+The temperature increased at 
+`r n.increase`
+ stations and decreased at 
+`r n.decrease`
+.

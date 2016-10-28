@@ -32,7 +32,7 @@ rm(list=ls())
 # direct.surface
 # This function generates points on the surface of a sphere with a uniform distribution
 #
-# See Statistical Mechanics: Algorithms and Computations, Werber Krauth
+# See Statistical Mechanics: Algorithms and Computations, Werner Krauth
 # http://blancopeck.net/Statistics.pdf
 # https://www.amazon.com/Statistical-Mechanics-Algorithms-Computations-Physics/dp/0198515367
 
