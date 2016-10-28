@@ -15,6 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>
 
+# Code to suppport term=project.Rmd
+
+###
+
+# The next few lines make sure that the necessary libraries are present. It is a good
+# idea to execute them one directly from R, as RMarkdown doesn't handle the install.packages
+# correclt. Once the libraries have been installed, RMarkdown will be happy
+
 if (!require(NISTunits)) {
   install.packages("NISTunits", dependencies = TRUE)
   library(NISTunits)
@@ -25,7 +33,9 @@ if (!require(png)) {
   library(png)
 }
 
-setwd("~/../global")
+###
+
+setwd("~/../global")  #This is the correct path on my computer
 
 rm(list=ls())
 
@@ -43,7 +53,8 @@ direct.surface <- function(d=3){
 }
 
 
-
+# Read the index file for the stations. The file format is documented
+# in the README at ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/
 
 # ID                 1-11        Integer
 # LATITUDE          13-20        Real
@@ -104,6 +115,9 @@ read.index <-
     ))
   }
 
+# Add x,y,z coordinates for each station, using the latitude and longitude, and assuming that
+# the radious of the globe is 1
+
 add.cartesian.coordinates<-function(my.table) {
   x.coordinate <- function(latitude,longitude,R = 1) {
     return (cos(NISTdegTOradian(latitude)) * cos(NISTdegTOradian(longitude)))
@@ -126,7 +140,7 @@ add.cartesian.coordinates<-function(my.table) {
 }
 
 
-
+# find the station that is closest to a specified (x,y,z)
 find.closest.station<-function(point,station.data) {
   get.distance.squared <- function(id,point,station.data) {
     station <- station.data[id,]
@@ -142,6 +156,8 @@ find.closest.station<-function(point,station.data) {
 }
 
 
+# Generate a specified number of stations IDs by sampling the globe uniformly, then finding the
+# nearest station to each point
 
 random.station.ids<-function(n,station.data) {
   random.station<-function(dummy,station.data){
@@ -149,6 +165,9 @@ random.station.ids<-function(n,station.data) {
   }
   return(unlist(lapply(rep(0,n),random.station,station.data)))
 }
+
+# Read the average temperature file for the stations. The file format is documented
+# in the README at ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/
 
 read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120){
  temperature.data<-read.fwf(name,
@@ -205,6 +224,10 @@ read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120
 }
 
 
+# Find random station that actually have some data
+# 1. Find those station that actually have data
+# 2. Sample random locations
+# 3. Find nearest station with data to each location
 
 get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999){
   get.stations.with.data<-function(temperatures,from=1950,to=9999){
@@ -221,10 +244,14 @@ get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999
   return(random.station.ids(n,index.with.data))
 }
 
+# Find temperature data for specified station
+
 get.data.for.station<-function(id,temperature.data,from=1950,to=9999) {
   return (temperature.data[temperature.data$ID==id & from<=temperature.data$YEAR & temperature.data$YEAR<=to,])
 }
 
+# For each record (for one year), average the temperatures from each month,
+# then append average to record
 
 attach.average.temperature<-function(temperature.data){
   get.average.temperature.year<-function(year,temperature.data){
