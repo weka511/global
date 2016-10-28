@@ -22,7 +22,7 @@ if (!require(NISTunits)) {
 
 setwd("~/../global")
 
-rm(list=ls())
+#rm(list=ls())
 
 # direct.surface
 # This function generates points on the surface of a sphere with a uniform distribution
@@ -120,16 +120,17 @@ add.cartesian.coordinates<-function(my.table) {
   return (result)
 }
 
-get.distance.squared <- function(id,point,station.data) {
-  station <- station.data[id,]
-  return (
-    (point[1] - station$X) * (point[1] - station$X) +
-      (point[2] - station$Y) * (point[2] - station$Y) +
-      (point[3] - station$Z) * (point[3] - station$Z)
-  )
-}
+
 
 find.closest.station<-function(point,station.data) {
+  get.distance.squared <- function(id,point,station.data) {
+    station <- station.data[id,]
+    return (
+      (point[1] - station$X) * (point[1] - station$X) +
+        (point[2] - station$Y) * (point[2] - station$Y) +
+        (point[3] - station$Z) * (point[3] - station$Z)
+    )
+  }
   distances<-lapply(rownames(station.data),get.distance.squared,point,station.data)
   index<-which.min(distances)
   return (rownames(station.data)[index])
@@ -144,7 +145,7 @@ random.station.ids<-function(n,station.data) {
 }
 
 read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120){
-  return (read.fwf(name,
+ temperature.data<-read.fwf(name,
                    c(11,4,4,
                      5,1,1,1,
                      5,1,1,1,
@@ -173,18 +174,43 @@ read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120
                               'VALUE12','DMFLAG12','QCFLAG12','DSFLAG12'
                               ),
                    colClasses=c('character','integer','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character',
-                                'integer','character','character','character'  ),
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character',
+                                'numeric','character','character','character'  ),
                    n = n,
-                   fill=TRUE))
+                   fill=TRUE)
+  value.names<-colnames(temperature.data)[4*seq(1,12)]
+  for (j in value.names)
+    for (i in 1:nrow(temperature.data))
+      if (temperature.data[i,j] == -9999)
+        temperature.data[i,j]=NA
+
+  temperature.data[,value.names]<-temperature.data[,value.names]/100
+  return (temperature.data)
 }
+
+get.stations.with.data<-function(temperatures,from=1950,to=9999){
+  records<-temperatures[from <= temperatures$YEAR & temperatures$YEAR<=to,]
+  ids=records$ID
+  df<-data.frame(unique(ids))
+  colnames(df)<-c('ID')
+  return (df)
+}
+
+get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999){
+  sss<-get.stations.with.data(temperatures,from=from,to=to)
+  ccc<-add.cartesian.coordinates(index)
+  mmm<-merge(ccc,sss)
+  rownames(mmm)<-mmm$ID
+  return(random.station.ids(n,mmm))
+}
+

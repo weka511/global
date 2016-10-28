@@ -23,8 +23,13 @@ The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
 # Results
 
 ```{r}
-station.index<-add.cartesian.coordinates(read.index(n=n))
-ids<-random.station.ids(7,station.index)
+station.index<-read.index()
+temperature.readings<-read.temperatures(n=100000)
+ids<-get.random.stations.with.data(25,station.index,temperature.readings)
+
+#station.index<-add.cartesian.coordinates(read.index(n=n))
+#ids<-random.station.ids(7,station.index)
+rownames(station.index)<-station.index$ID
 ss<-subset(station.index[ids,],TRUE,c('ID','NAME','LATITUDE','LONGITUDE'))
 kable(ss,row.names=FALSE)
 ```
