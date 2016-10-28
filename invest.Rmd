@@ -4,10 +4,13 @@ author: "Simon Crase"
 date: "27 October 2016"
 output: html_document
 ---
-```{r,echo=FALSE,warning=FALSE}
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(knitr)
 source('timeseries.R')
-n=-1
+# Set n.records to -1 to process the entire dataset, 0r 10000 for testing
+n.records=100000
+# Number of stations
+n.stations=25
 ```
 
 # Idea
@@ -24,8 +27,8 @@ The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
 
 ```{r,echo=FALSE}
 station.index<-read.index()
-temperature.readings<-read.temperatures(n=1000)
-ids<-get.random.stations.with.data(25,station.index,temperature.readings)
+temperature.readings<-read.temperatures(n=n.records)
+ids<-get.random.stations.with.data(n.stations,station.index,temperature.readings)
 rownames(station.index)<-station.index$ID
 ss<-subset(station.index[ids,],TRUE,c('ID','NAME','LATITUDE','LONGITUDE'))
 kable(ss,row.names=FALSE)
@@ -33,6 +36,9 @@ for (id in ids){
   dd<-get.data.for.station(id,temperature.readings)
   dd<-attach.average.temperature(dd)
   name<-station.index[station.index$ID==id,5]
-  plot(x=dd$YEAR,y=dd$MEAN,main=paste(id,name,sep=': '),xlab = "Year", ylab="Average T")
+  x<-dd$YEAR
+  y<-dd$MEAN
+  plot(x=x,y=y,main=paste(id,name,sep=': '),xlab = "Year", ylab="Average T")
+  abline(lm(y~x), col="red")
 }
 ```

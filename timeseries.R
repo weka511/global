@@ -136,11 +136,12 @@ find.closest.station<-function(point,station.data) {
   return (rownames(station.data)[index])
 }
 
-random.station<-function(dummy,station.data){
-  find.closest.station(direct.surface(),station.data)
-}
+
 
 random.station.ids<-function(n,station.data) {
+  random.station<-function(dummy,station.data){
+    find.closest.station(direct.surface(),station.data)
+  }
   return(unlist(lapply(rep(0,n),random.station,station.data)))
 }
 
@@ -198,33 +199,34 @@ read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120
   return (temperature.data)
 }
 
-get.stations.with.data<-function(temperatures,from=1950,to=9999){
-  records<-temperatures[from <= temperatures$YEAR & temperatures$YEAR<=to,]
-  ids=records$ID
-  df<-data.frame(unique(ids))
-  colnames(df)<-c('ID')
-  return (df)
-}
+
 
 get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999){
-  sss<-get.stations.with.data(temperatures,from=from,to=to)
-  ccc<-add.cartesian.coordinates(index)
-  mmm<-merge(ccc,sss)
-  rownames(mmm)<-mmm$ID
-  return(random.station.ids(n,mmm))
+  get.stations.with.data<-function(temperatures,from=1950,to=9999){
+    records<-temperatures[from <= temperatures$YEAR & temperatures$YEAR<=to,]
+    ids=records$ID
+    df<-data.frame(unique(ids))
+    colnames(df)<-c('ID')
+    return (df)
+  }
+  stations.with.data<-get.stations.with.data(temperatures,from=from,to=to)
+  index.with.cartesian.coordinates<-add.cartesian.coordinates(index)
+  index.with.data<-merge(index.with.cartesian.coordinates,stations.with.data)
+  rownames(index.with.data)<-index.with.data$ID
+  return(random.station.ids(n,index.with.data))
 }
 
 get.data.for.station<-function(id,temperature.data,from=1950,to=9999) {
   return (temperature.data[temperature.data$ID==id & from<=temperature.data$YEAR & temperature.data$YEAR<=to,])
 }
 
-get.average.temperature.year<-function(year,temperature.data){
-  value.names<-colnames(temperature.data)[4*seq(1,12)]
-  values<-as.numeric(temperature.data[temperature.data$YEAR==year,value.names])
-  return (mean(values,na.rm = TRUE))
-}
 
 attach.average.temperature<-function(temperature.data){
+  get.average.temperature.year<-function(year,temperature.data){
+    value.names<-colnames(temperature.data)[4*seq(1,12)]
+    values<-as.numeric(temperature.data[temperature.data$YEAR==year,value.names])
+    return (mean(values,na.rm = TRUE))
+  }
   averages<-data.frame(sapply(temperature.data$YEAR,get.average.temperature.year,temperature.data))
   result<-cbind(temperature.data,averages)
   colnames(result)[length(result)]<-'MEAN'
