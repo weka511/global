@@ -12,7 +12,7 @@ n=-1
 
 # Idea
 
-Many people do not accept that global are rising. While some of them are naïve, others are shrewd investors. I wondered what would happen if these folk tought about the temperature the way they think of investments.
+Many people do not accept that global are rising. While some of them are naïve, others are shrewd investors. I wondered what would happen if these folk thought about the temperature the way they think of investments.
 
 The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
 
@@ -22,14 +22,17 @@ The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
 
 # Results
 
-```{r}
+```{r,echo=FALSE}
 station.index<-read.index()
-temperature.readings<-read.temperatures(n=100000)
+temperature.readings<-read.temperatures(n=1000)
 ids<-get.random.stations.with.data(25,station.index,temperature.readings)
-
-#station.index<-add.cartesian.coordinates(read.index(n=n))
-#ids<-random.station.ids(7,station.index)
 rownames(station.index)<-station.index$ID
 ss<-subset(station.index[ids,],TRUE,c('ID','NAME','LATITUDE','LONGITUDE'))
 kable(ss,row.names=FALSE)
+for (id in ids){
+  dd<-get.data.for.station(id,temperature.readings)
+  dd<-attach.average.temperature(dd)
+  name<-station.index[station.index$ID==id,5]
+  plot(x=dd$YEAR,y=dd$MEAN,main=paste(id,name,sep=': '),xlab = "Year", ylab="Average T")
+}
 ```

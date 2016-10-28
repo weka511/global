@@ -22,7 +22,7 @@ if (!require(NISTunits)) {
 
 setwd("~/../global")
 
-#rm(list=ls())
+rm(list=ls())
 
 # direct.surface
 # This function generates points on the surface of a sphere with a uniform distribution
@@ -214,3 +214,19 @@ get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999
   return(random.station.ids(n,mmm))
 }
 
+get.data.for.station<-function(id,temperature.data,from=1950,to=9999) {
+  return (temperature.data[temperature.data$ID==id & from<=temperature.data$YEAR & temperature.data$YEAR<=to,])
+}
+
+get.average.temperature.year<-function(year,temperature.data){
+  value.names<-colnames(temperature.data)[4*seq(1,12)]
+  values<-as.numeric(temperature.data[temperature.data$YEAR==year,value.names])
+  return (mean(values,na.rm = TRUE))
+}
+
+attach.average.temperature<-function(temperature.data){
+  averages<-data.frame(sapply(temperature.data$YEAR,get.average.temperature.year,temperature.data))
+  result<-cbind(temperature.data,averages)
+  colnames(result)[length(result)]<-'MEAN'
+  return (result)
+}
