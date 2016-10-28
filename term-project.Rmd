@@ -15,7 +15,7 @@ n.stations=25
 
 # Idea
 
-Many people do not accept that global are rising. While some of them are naïve, others are shrewd investors. I wondered what would happen if these folk thought about the temperature the way they think of investments.
+Many people do not accept that global are rising. While some of them are naÃ¯ve, others are shrewd investors. I wondered what would happen if these folk thought about the temperature the way they think of investments.
 
 The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
 
