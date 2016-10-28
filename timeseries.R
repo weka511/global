@@ -20,6 +20,11 @@ if (!require(NISTunits)) {
   library(NISTunits)
 }
 
+if (!require(png)) {
+  install.packages("png", dependencies = TRUE)
+  library(png)
+}
+
 setwd("~/../global")
 
 rm(list=ls())

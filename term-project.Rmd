@@ -2,22 +2,31 @@
 title: "Going Long on Temperature"
 author: "Simon Crase"
 date: "27 October 2016"
-output: html_document
+output: pdf_document
 ---
 ```{r,echo=FALSE,warning=FALSE,message=FALSE}
 library(knitr)
 source('timeseries.R')
 # Set n.records to -1 to process the entire dataset, 0r 10000 for testing
-n.records=100000
+n.records=1000
 # Number of stations
 n.stations=25
 ```
 
-# Idea
+# Introduction
 
-Many people do not accept that global are rising. While some of them are naïve, others are shrewd investors. I wondered what would happen if these folk thought about the temperature the way they think of investments.
+##Idea
 
-The Sharpe Ratio is an important tool for judging a stock: $\frac{\mu}{\sigma}$
+My project started with the idea of presenting temperatues from randomly selected station. I downloaded the list of station names from the [Time Series Browser](http://climatemodels.uchicago.edu/timeseries/), and wrote a short Python script to select station names at random. I then manually selected stations, see link [here](http://climatemodels.uchicago.edu/timeseries/#DpPwBjiUcCsBdlJzLhDaoQtEqDsJqMgRz).
+```{r fig.width=5, fig.height=5,echo=FALSE,fig.align='left'}
+library(grid)
+img <- readPNG("TimeSeriesBrowser.png")
+ grid.raster(img)
+```
+
+
+##References
+Code is stored in [my Github repository - user name 'weka11'](https://github.com/weka511/global)
 
 # Methodology
 
