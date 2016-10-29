@@ -54,6 +54,7 @@ I decided against using the Time Series Browser, as it was designed for accessin
 ```{r,echo=FALSE}
 n.increase<-0
 n.decrease<-0
+total.slope<-0
 station.index<-read.index()
 temperature.readings<-read.temperatures(n=n.records)
 ids<-get.random.stations.with.data(n.stations,station.index,temperature.readings)
@@ -77,6 +78,7 @@ for (id in ids){
   result = tryCatch({
     if (slope>0) n.increase <- n.increase +1
     if (slope<0) n.decrease <- n.decrease +1
+    total.slope = total.slope + slope
     sub<-sprintf("Slope: %.2f degrees per century", 100*slope)
     plot(x=x,y=y,main=paste(id,name,sep=': '),sub=sub,xlab = "Year", ylab="Average T")
     abline(model, col="red")
@@ -100,10 +102,13 @@ The temperature increased at
  stations and decreased at 
 `r n.decrease`
  stations. This is in line with the results I have seen each time I have generated this report for a new random selection: there are far more stations with increases than decreases.
+Average increase is 
+`r sprintf("%.4f",0.01*total.slope/(n.increase + n.decrease))`
+ degrees/century.
  
 # Future work
 
 * Allow user to specify number of results needed since 1950 (currently script just requires some results).
-* Allow user sp specify a threshold for increases, so we would only consider temperature to increasing if the slopw exceeded some value - say 0.5 degrees per century.
+* Allow user to specify a threshold for increases, so we would only consider temperature to be increasing if the slope exceeded some value - say 0.5 degrees per century.
 * Include a summary plot for all stations.
-* Allow program to download latest data from NOAA, insetad of using canned data.
+* Allow program to download latest data from NOAA, instad of using canned data.
