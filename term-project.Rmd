@@ -103,12 +103,11 @@ The temperature increased at
 `r n.decrease`
  stations. This is in line with the results I have seen each time I have generated this report for a new random selection: there are far more stations with increases than decreases.
 Average increase is 
-`r sprintf("%.4f",0.01*total.slope/(n.increase + n.decrease))`
+`r sprintf("%.1f",100.0*total.slope/(n.increase + n.decrease))`
  degrees/century.
  
 # Future work
 
-* Allow user to specify number of results needed since 1950 (currently script just requires some results).
 * Allow user to specify a threshold for increases, so we would only consider temperature to be increasing if the slope exceeded some value - say 0.5 degrees per century.
 * Include a summary plot for all stations.
 * Allow program to download latest data from NOAA, instad of using canned data.

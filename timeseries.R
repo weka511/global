@@ -169,7 +169,7 @@ random.station.ids<-function(n,station.data) {
 # Read the average temperature file for the stations. The file format is documented
 # in the README at ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3/
 
-read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120){
+read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = -1){
  temperature.data<-read.fwf(name,
                    c(11,4,4,
                      5,1,1,1,
@@ -229,11 +229,12 @@ read.temperatures<-function(name = 'ghcnm.tavg.v3.3.0.20161026.qca.dat', n = 120
 # 2. Sample random locations
 # 3. Find nearest station with data to each location
 
-get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999){
-  get.stations.with.data<-function(temperatures,from=1950,to=9999){
+get.random.stations.with.data <- function(n,index,temperatures,from=1950,to=9999,n.obs=12){
+  get.stations.with.data<-function(temperatures,from=1950,to=9999,n.obs=12){
     records<-temperatures[from <= temperatures$YEAR & temperatures$YEAR<=to,]
-    ids=records$ID
-    df<-data.frame(unique(ids))
+    frequency.table<-as.data.frame(table(records$ID))
+    ids<-frequency.table[frequency.table$Freq>n.obs,][1]
+    df<-data.frame(ids)
     colnames(df)<-c('ID')
     return (df)
   }
