@@ -1,18 +1,44 @@
+# Copyright (C) 2016 Greenweaves Software Pty Ltd
+#
+# simon@greenweaves.nz
+#
+# This is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>
+
+# Code to suppport term=project.Rmd
+
 library(data.table)
 
 get.file.name<-function(prefix,reading,date,adj,tar='tar',gz='gz') {
   return (paste(prefix,reading,date,adj,tar,gz,sep='.')) 
 }
 
-my.untar<-function (file,list=TRUE,out.path='.\\data', program='C:\\7z1604-extra\\7za',cmd='e'){
-#   file='C:\\Users\\Weka\\global\\data\\ghcnm.tmax.latest.qcu.tar.gz'
-#   program<-'C:\\7z1604-extra\\7za'
-  
-  
-  # out='.\\data'
-  system(sprintf('%s %s %s -o%s',program,cmd,file,out.path))
-  tar.name<-sub('.gz$','',file)
-  system(sprintf('%s %s %s -o%s',program,cmd,tar.name,out.path))
+my.untar<-function (file,list=TRUE,out.path='.\\data', program='C:\\7z1604-extra\\7za',cmd='e',clean=TRUE){
+  untar.command<-function(file.name){
+    system(sprintf('%s %s %s -o%s -y',program,cmd,file.name,out.path))
+  }
+ 
+  untar.command(file)
+  tar.file<-sub('.gz$','',file)
+  untar.command(tar.file)
+  if (clean) {
+    file.remove(file)
+    file.remove(tar.file)
+  }
+  parts<-unlist(strsplit(basename(file),'.',fix=TRUE))
+  pattern<-sprintf('%s.%s.*%s.((dat)|(inv))',parts[1],parts[2],parts[4])
+  files<-list.files(out.path,pattern=pattern)
+  return (lapply(files,function(x){return (file.path(out.path,x))}))
 }
 
 download.temperature.data<-function(
@@ -27,14 +53,11 @@ download.temperature.data<-function(
   source.file.name<-file.path(data.path,file.name)
   dest.file<-file.path(subdir,file.name)
   download.file(source.file.name,dest=dest.file)
-  print (file.name)
-  ut<-untar.function(dest.file,list=TRUE)
-  print(ut)
-  return(ut)
+  return (untar.function(dest.file,list=TRUE))
 }
 
-fread.data<-function(name) {
-  raw<-fread(name,sep='\t',header=FALSE)
+fread.data<-function(file.name) {
+  raw<-fread(file.name,sep='\t',header=FALSE)
   ids<-substr(raw$V1,1,11)
   year<-as.integer(substr(raw$V1,12,15))
   element<-substr(raw$V1,16,19)
