@@ -8,7 +8,7 @@ output: pdf_document
 library(knitr)
 source('timeseries.R')
 # Set n.records to -1 to process the entire dataset, 0r 10000 for testing
-n.records <- 1000
+n.records <- -1
 # Number of stations
 n.stations <- 25
 ```
