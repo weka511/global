@@ -4,17 +4,31 @@ get.file.name<-function(prefix,reading,date,adj,tar='tar',gz='gz') {
   return (paste(prefix,reading,date,adj,tar,gz,sep='.')) 
 }
 
+my.untar<-function (file,list=TRUE,out.path='.\\data', program='C:\\7z1604-extra\\7za',cmd='e'){
+#   file='C:\\Users\\Weka\\global\\data\\ghcnm.tmax.latest.qcu.tar.gz'
+#   program<-'C:\\7z1604-extra\\7za'
+  
+  
+  # out='.\\data'
+  system(sprintf('%s %s %s -o%s',program,cmd,file,out.path))
+  tar.name<-sub('.gz$','',file)
+  system(sprintf('%s %s %s -o%s',program,cmd,tar.name,out.path))
+}
+
 download.temperature.data<-function(
   data.path='ftp://ftp.ncdc.noaa.gov/pub/data/ghcn/v3',
           prefix='ghcnm',
           reading='tmax',
           date='latest',
-          adj='qcu') {
+          adj='qcu',
+          subdir='./data',
+          untar.function=my.untar) {
   file.name<-get.file.name(prefix,reading,date,adj)
-  fn<-file.path(data.path,file.name)
-  download.file(fn,dest=file.name)
+  source.file.name<-file.path(data.path,file.name)
+  dest.file<-file.path(subdir,file.name)
+  download.file(source.file.name,dest=dest.file)
   print (file.name)
-  ut<-untar(file.name,list=TRUE,exdir = 'c:\\temp')
+  ut<-untar.function(dest.file,list=TRUE)
   print(ut)
   return(ut)
 }
