@@ -66,7 +66,8 @@ fread.data<-function(file.name) {
   columns<-c('ID','YEAR','ELEMENT')
   for (i in 1:12) {
     pos<-8*i+12
-    value<-as.integer(substring(raw$V1,pos,pos+4))
+    value.as.integer<-as.numeric(substring(raw$V1,pos,pos+4))
+    value<-unlist(lapply(value.as.integer,function(v) {if (v==-9999) return(as.numeric('NA')) else return(v/100)}))
     dmflag<-substring(raw$V1,pos+5,pos+5)
     qcflag<-substring(raw$V1,pos+6,pos+6)
     dsflag<-substring(raw$V1,pos+7,pos+7)
@@ -104,22 +105,8 @@ fread.index<-function(file.name) {
                 topo,stveg,stloc,ocndis,airstn,towndis,grveg,popcss)
   result$V1<-NULL
   colnames(result)<-c(
-    "ID", 
-    "LATITUDE",
-    "LONGITUDE",
-    "STNELEV",
-    "NAME",
-    "GRELEV",
-    "POPCLS",
-    "POPSIZ",
-    "TOPO",
-    "STVEG",
-    "STLOC",
-    "OCNDIS",
-    "AIRSTN",
-    "TOWNDIS",
-    "GRVEG",
-    "POPCSS"
+    "ID", "LATITUDE", "LONGITUDE", "STNELEV", "NAME", "GRELEV", "POPCLS", "POPSIZ",
+    "TOPO", "STVEG", "STLOC", "OCNDIS", "AIRSTN", "TOWNDIS", "GRVEG", "POPCSS"
   )
   return (result)
 }
