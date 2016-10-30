@@ -80,3 +80,46 @@ fread.data<-function(file.name) {
   colnames(result)<-columns
   return (result)
 }
+
+
+fread.index<-function(file.name) {
+  raw<-fread(file.name,sep='\t',header=FALSE)
+  ids<-substr(raw$V1,1,11)
+  latitude<-as.numeric(substr(raw$V1,13,20))
+  longitude<-as.numeric(substr(raw$V1,22,30))
+  stnelev<-as.numeric(substr(raw$V1,32,37))
+  names<-substr(raw$V1,39,68)
+  grelev<-as.integer(substr(raw$V1,70,73))
+  popcls<-substr(raw$V1,74,74)
+  popsiz<-as.integer(substr(raw$V1,75,79))
+  topo<-substr(raw$V1,80,81)
+  stveg<-substr(raw$V1,82,83)
+  stloc<-substr(raw$V1,84,85)
+  ocndis<-as.integer(substr(raw$V1,86,87))
+  airstn<-substr(raw$V1,89,90)
+  towndis<-as.integer(substr(raw$V1,89,90))
+  grveg<-substr(raw$V1,91,106)
+  popcss<-substr(raw$V1,107,107)
+  result<-cbind(raw,ids,latitude,longitude, stnelev,names,grelev,popcls,popsiz,
+                topo,stveg,stloc,ocndis,airstn,towndis,grveg,popcss)
+  result$V1<-NULL
+  colnames(result)<-c(
+    "ID", 
+    "LATITUDE",
+    "LONGITUDE",
+    "STNELEV",
+    "NAME",
+    "GRELEV",
+    "POPCLS",
+    "POPSIZ",
+    "TOPO",
+    "STVEG",
+    "STLOC",
+    "OCNDIS",
+    "AIRSTN",
+    "TOWNDIS",
+    "GRVEG",
+    "POPCSS"
+  )
+  return (result)
+}
